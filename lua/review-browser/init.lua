@@ -11,6 +11,34 @@ local installers = {
   },
 }
 
+local function find_section_bounds()
+  local cur = vim.fn.line(".")
+  local last = vim.fn.line("$")
+  local start_lnum
+
+  for lnum = cur, 1, -1 do
+    local line = vim.fn.getline(lnum)
+    local clean = line:gsub("^#+%s*", ""):gsub("%*%*", ""):gsub("`", "")
+    local file = clean:match("([%w%.%/_%-]+%.%a+):?%d*")
+    if file and vim.fn.filereadable(file) == 1 then
+      start_lnum = lnum
+      break
+    end
+  end
+
+  if not start_lnum then return nil, nil end
+
+  local end_lnum = last
+  for lnum = cur, last do
+    if vim.fn.getline(lnum):match("^%-%-%-") then
+      end_lnum = lnum
+      break
+    end
+  end
+
+  return start_lnum, end_lnum
+end
+
 local function find_file_upward()
   for lnum = vim.fn.line("."), 1, -1 do
     local line = vim.fn.getline(lnum)
@@ -22,6 +50,18 @@ local function find_file_upward()
     if file and vim.fn.filereadable(file) == 1 then
       return file, lineno
     end
+  end
+end
+
+local function open_file(cmd_prefix)
+  local file, lnum = find_file_upward()
+  if file then
+    local cmd = lnum
+      and string.format("%s +%s %s", cmd_prefix, lnum, vim.fn.fnameescape(file))
+      or (cmd_prefix .. " " .. vim.fn.fnameescape(file))
+    vim.cmd(cmd)
+  else
+    vim.notify("No readable file found above cursor", vim.log.levels.WARN)
   end
 end
 
@@ -66,22 +106,29 @@ function M.setup()
     callback = function()
       vim.wo.wrap = true
       vim.wo.linebreak = true
-      local function open_file(cmd_prefix)
-        local file, lnum = find_file_upward()
-        if file then
-          local cmd = lnum
-            and string.format("%s +%s %s", cmd_prefix, lnum, vim.fn.fnameescape(file))
-            or (cmd_prefix .. " " .. vim.fn.fnameescape(file))
-          vim.cmd(cmd)
-        else
-          vim.notify("No readable file found above cursor", vim.log.levels.WARN)
-        end
-      end
 
-      vim.keymap.set("n", "gF", function() open_file("edit") end,
-        { buffer = true, desc = "Open nearest file reference in current window" })
-      vim.keymap.set("n", "gf", function() open_file("rightbelow vsplit") end,
-        { buffer = true, desc = "Open nearest file reference in right split" })
+      vim.api.nvim_buf_create_user_command(0, "ReviewOpen", function()
+        open_file("edit")
+      end, { desc = "Open nearest file reference in current window" })
+
+      vim.api.nvim_buf_create_user_command(0, "ReviewOpenSplit", function()
+        open_file("rightbelow vsplit")
+      end, { desc = "Open nearest file reference in right split" })
+
+      vim.api.nvim_buf_create_user_command(0, "ReviewCopySection", function()
+        local s, e = find_section_bounds()
+        if not s then
+          vim.notify("No section found", vim.log.levels.WARN)
+          return
+        end
+        local lines = vim.api.nvim_buf_get_lines(0, s - 1, e, false)
+        vim.fn.setreg("+", table.concat(lines, "\n"))
+        vim.notify(string.format("Copied %d lines to clipboard", e - s + 1), vim.log.levels.INFO)
+      end, { desc = "Copy current review section to clipboard" })
+
+      vim.keymap.set("n", "gF",          "<cmd>ReviewOpen<cr>",        { buffer = true, desc = "ReviewOpen" })
+      vim.keymap.set("n", "gf",          "<cmd>ReviewOpenSplit<cr>",   { buffer = true, desc = "ReviewOpenSplit" })
+      vim.keymap.set("n", "<leader>cy",  "<cmd>ReviewCopySection<cr>", { buffer = true, desc = "ReviewCopySection" })
     end,
   })
 end

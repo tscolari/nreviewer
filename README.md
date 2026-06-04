@@ -23,10 +23,11 @@ The `/review-branch` Claude Code command reviews your branch diff against `main`
 }
 ```
 
-Optional keymap:
+Optional keymaps:
 
 ```lua
 vim.keymap.set("n", "<leader>cr", "<cmd>ReviewBrowse<cr>", { desc = "Browse code reviews" })
+-- <leader>cy (copy section) is set automatically inside review buffers
 ```
 
 ### Claude Code command
@@ -51,10 +52,24 @@ Adjust the source path to match your lazy.nvim install directory if different.
 
 `gf`/`gF` search backwards from the cursor, so they work anywhere within a file's section — not just on the filename line itself.
 
-## Features
+## Commands
 
-- `:ReviewBrowse` — date-sorted picker of `.reviews/*.md`, opens selected full screen
-- `gf` — opens file reference in a right vsplit
-- `gF` — opens file reference in the current window
-- Line wrapping enabled automatically in review buffers
-- No external dependencies
+| Command | Description |
+|---------|-------------|
+| `:ReviewBrowse` | Date-sorted picker of `.reviews/*.md`, opens selected full screen |
+| `:ReviewOpen` | Open nearest file reference above cursor in current window |
+| `:ReviewOpenSplit` | Open nearest file reference above cursor in a right vsplit |
+| `:ReviewCopySection` | Copy current file section (header → `---`) to system clipboard |
+| `:ReviewBranchInstall <target>` | Symlink the review command (e.g. `:ReviewBranchInstall claude`) |
+
+`:ReviewOpen`, `:ReviewOpenSplit`, and `:ReviewCopySection` are buffer-local — available only inside `.reviews/*.md` files.
+
+## Default keymaps
+
+Set automatically inside review buffers. Override by mapping to the commands above.
+
+| Key | Command |
+|-----|---------|
+| `gf` | `:ReviewOpenSplit` |
+| `gF` | `:ReviewOpen` |
+| `<leader>cy` | `:ReviewCopySection` |
