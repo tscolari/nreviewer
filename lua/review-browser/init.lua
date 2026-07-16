@@ -9,6 +9,11 @@ local installers = {
     dest = vim.fn.expand("~/.claude/commands/review-branch.md"),
     dir  = vim.fn.expand("~/.claude/commands"),
   },
+  opencode = {
+    src  = plugin_dir .. "/commands/review-branch.md",
+    dest = vim.fn.expand("~/.opencode/commands/review-branch.md"),
+    dir  = vim.fn.expand("~/.opencode/commands"),
+  },
 }
 
 local function find_section_bounds()
@@ -57,8 +62,8 @@ local function open_file(cmd_prefix)
   local file, lnum = find_file_upward()
   if file then
     local cmd = lnum
-      and string.format("%s +%s %s", cmd_prefix, lnum, vim.fn.fnameescape(file))
-      or (cmd_prefix .. " " .. vim.fn.fnameescape(file))
+        and string.format("%s +%s %s", cmd_prefix, lnum, vim.fn.fnameescape(file))
+        or (cmd_prefix .. " " .. vim.fn.fnameescape(file))
     vim.cmd(cmd)
   else
     vim.notify("No readable file found above cursor", vim.log.levels.WARN)
@@ -70,7 +75,8 @@ function M.setup()
     local target = opts.args
     local installer = installers[target]
     if not installer then
-      vim.notify("Unknown target '" .. target .. "'. Available: " .. table.concat(vim.tbl_keys(installers), ", "), vim.log.levels.ERROR)
+      vim.notify("Unknown target '" .. target .. "'. Available: " .. table.concat(vim.tbl_keys(installers), ", "),
+        vim.log.levels.ERROR)
       return
     end
     vim.fn.mkdir(installer.dir, "p")
@@ -126,9 +132,9 @@ function M.setup()
         vim.notify(string.format("Copied %d lines to clipboard", e - s + 1), vim.log.levels.INFO)
       end, { desc = "Copy current review section to clipboard" })
 
-      vim.keymap.set("n", "gF",          "<cmd>ReviewOpen<cr>",        { buffer = true, desc = "ReviewOpen" })
-      vim.keymap.set("n", "gf",          "<cmd>ReviewOpenSplit<cr>",   { buffer = true, desc = "ReviewOpenSplit" })
-      vim.keymap.set("n", "<leader>cy",  "<cmd>ReviewCopySection<cr>", { buffer = true, desc = "ReviewCopySection" })
+      vim.keymap.set("n", "gF", "<cmd>ReviewOpen<cr>", { buffer = true, desc = "ReviewOpen" })
+      vim.keymap.set("n", "gf", "<cmd>ReviewOpenSplit<cr>", { buffer = true, desc = "ReviewOpenSplit" })
+      vim.keymap.set("n", "<leader>cy", "<cmd>ReviewCopySection<cr>", { buffer = true, desc = "ReviewCopySection" })
     end,
   })
 end
