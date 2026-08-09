@@ -14,7 +14,9 @@ let
   # place. Paths are relative to $HOME.
   agentDirs = {
     claude = ".claude/commands";
-    opencode = ".opencode/commands";
+    # opencode scans `{command,commands}/**/*.md` under its global config dir;
+    # `~/.opencode` is the project-level location, not the global one.
+    opencode = ".config/opencode/commands";
   };
 
   commandSource = "${cfg.package}/${cfg.package.commandFile}";

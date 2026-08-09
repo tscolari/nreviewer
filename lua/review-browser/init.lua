@@ -9,10 +9,11 @@ local installers = {
     dest = vim.fn.expand("~/.claude/commands/review-branch.md"),
     dir  = vim.fn.expand("~/.claude/commands"),
   },
+  -- opencode's global command dir; ~/.opencode is the project-level one.
   opencode = {
     src  = plugin_dir .. "/commands/review-branch.md",
-    dest = vim.fn.expand("~/.opencode/commands/review-branch.md"),
-    dir  = vim.fn.expand("~/.opencode/commands"),
+    dest = vim.fn.expand("~/.config/opencode/commands/review-branch.md"),
+    dir  = vim.fn.expand("~/.config/opencode/commands"),
   },
 }
 

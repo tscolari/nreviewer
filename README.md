@@ -31,7 +31,7 @@ Then, once, from Neovim:
 :ReviewBranchInstall claude    " or: :ReviewBranchInstall opencode
 ```
 
-That symlinks `commands/review-branch.md` out of the plugin's own install directory (resolved automatically, wherever lazy.nvim put it) into `~/.claude/commands/` or `~/.opencode/commands/`.
+That symlinks `commands/review-branch.md` out of the plugin's own install directory (resolved automatically, wherever lazy.nvim put it) into `~/.claude/commands/` or `~/.config/opencode/commands/`.
 
 Optional keymap — `<leader>cy` (copy section) is set automatically inside review buffers:
 
@@ -70,7 +70,7 @@ Either apply `inputs.nreviewer.overlays.default` for `pkgs.nreviewer`, or use `i
 |--------|---------|-------------|
 | `programs.nreviewer.enable` | `false` | Install the command file |
 | `programs.nreviewer.package` | this flake's package | Package to take `review-branch.md` from |
-| `programs.nreviewer.agents` | `[ "claude" ]` | Any of `claude` (`~/.claude/commands`), `opencode` (`~/.opencode/commands`) |
+| `programs.nreviewer.agents` | `[ "claude" ]` | Any of `claude` (`~/.claude/commands`), `opencode` (`~/.config/opencode/commands`) |
 | `programs.nreviewer.extraCommandDirs` | `[ ]` | Extra `$HOME`-relative directories for agents not covered above |
 
 Also available: `nix build` / `nix flake check` (headless-Neovim load check), a `devShells.default` with neovim, lua-language-server and stylua, and `nix fmt`.
