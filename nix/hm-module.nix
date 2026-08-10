@@ -53,7 +53,7 @@ in
         Agents to install `review-branch.md` for. Replaces the manual
         `:ReviewBranchInstall <agent>` step: `claude` writes
         `~/.claude/commands/review-branch.md`, `opencode` writes
-        `~/.opencode/commands/review-branch.md`.
+        `~/.config/opencode/commands/review-branch.md`.
       '';
     };
 
