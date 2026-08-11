@@ -8,6 +8,8 @@ Opinionated around git worktrees — each worktree holds a single feature branch
 
 The `/review-branch` command reviews your branch diff against its base branch — `main` or `master`, detected automatically — and writes the result to `.reviews/<datetime>.md`. The Neovim plugin lets you browse those files and jump from review references directly into the source code.
 
+The base is always the remote-tracking ref, fetched at the start of the run, never your local `main`/`master`. A stale local base silently pulls every upstream commit you have not pulled into the diff, which turns a 20-file branch review into a 600-file one. Both ends of the diff are pinned to explicit shas so a commit landing mid-review cannot mix two HEADs into one report, and each review file opens with a header naming the base ref, the two shas, and any caveat — fetch failed, base fell back to a local ref, dirty working tree, HEAD moved.
+
 The review is multi-pass: four specialist reviewers (guidance-file compliance, bugs, security, and tests/performance) run in parallel, then every finding they produce is independently validated before it reaches the report, and unvalidated ones are discarded. That keeps false positives down at the cost of a noticeably slower and more token-hungry run than a single-pass review.
 
 ### Ticket context
@@ -85,7 +87,7 @@ Also available: `nix build` / `nix flake check` (headless-Neovim load check), a 
 
 ## Usage
 
-1. In a Claude Code or opencode session, run `/review-branch` — the branch is diffed against `main`/`master` and the review is written to `.reviews/<datetime>.md`. Expect it to take a while; it fans out to parallel reviewers and then validates each finding.
+1. In a Claude Code or opencode session, run `/review-branch` — the branch is diffed against a freshly fetched `origin/main`/`origin/master` and the review is written to `.reviews/<datetime>.md`. Expect it to take a while; it fans out to parallel reviewers and then validates each finding.
 2. In Neovim, run `:ReviewBrowse` — select a review to open it full screen
 3. Inside the review:
    - `gf` — open the nearest file reference above cursor in a right vsplit
